@@ -35,53 +35,6 @@ None of this is real data. Willy Wonka would I do apologise. It is a **made-up b
 
 That overlap is deliberate. A managed RAG system should find the right *kind* of document (precision) and, when a number lives in more than one place, not miss the extras (recall). A single Wikipedia-style page would not test that.
 
-### People, HR, and how the company is run
-
-| Document | Why it is in the bucket |
-|---|---|
-| `employee_handbook.md` | The “front door” doc. Welcome, values, hours, leave, headcount. Typical first hit for “who are we / how many staff”. |
-| `org_structure.md` | Roles, reporting lines, start years. Answers “who is Willy Wonka” without mixing in product lore. |
-| `onboarding_guide.md` | Day-one process. Shorter, procedural, different tone from the handbook. |
-| `oompa_loompa_employment_framework.md` | A second employment regime (shifts, leave, history since 1962). Real companies have parallel contracts; RAG has to keep them distinct. |
-| `expense_policy.md` | Everyday finance rules. Low drama, high volume of the sort staff actually search. |
-| `whistleblower_policy.md` | Ethics / legal. Tests retrieval on policy language, not story. |
-
-### Board, numbers, and strategy
-
-| Document |
-|---|---|
-| `board_minutes_q3_2023.md` / `board_minutes_q4_2023.md` | Time-stamped decisions and the same 3,200 headcount. Minutes are messy and specific — the opposite of a polished handbook. |
-| `annual_report_summary_2023.md` | Revenue mix, geography, year-on-year employees (2,950 → 3,200). A second source for the same KPI. |
-| `marketing_plan_2024.md` | Forward-looking commercial plan (budget, Japan launch). Strategy vs historical report. |
-| `sustainability_report_2023.md` | ESG-style narrative. Another “official” voice, useful for “what do we claim about cocoa / sourcing”. |
-
-### Product, R&D, and quality
-
-| Document |
-|---|---|
-| `product_spec_everlasting_gobstopper.md` | Flagship SKU, layers, Compound WX-77, who knows the formula. Dense technical spec — classic “search my product bible”. |
-| `product_spec_fizzy_lifting_drinks.md` / `product_spec_three_course_gum.md` | More SKUs so retrieval must pick the *right* product, not a generic sweets answer. |
-| `rd_memo_television_chocolate.md` | Internal R&D memo, not a customer spec. Different audience and confidentiality. |
-| `quality_control_procedures.md` | Inspection points, QC headcount. Operations, not marketing. |
-| `supplier_agreement_cocoa.md` | Contract summary (volumes, dates, Abidjan cooperative). Legal/commercial RAG, not a wiki page. |
-
-### Safety, incidents, and the factory floor
-
-| Document | 
-|---|---|
-| `health_and_safety_policy.md` / `emergency_evacuation_plan.md` | What *should* happen. Procedures vs the incident write-ups below. |
-| `incident_report_001_gloop.md` / `_002_beauregarde.md` / `_003_salt.md` | What *did* happen (factory-tour mishaps). Narrative, named people, dates. RAG should not confuse a 2005 incident with current policy. |
-| `complaint_response_teavee.md` | Legal letter to a family. Same tour, different document type (outbound correspondence). |
-| `factory_tour_guidelines.md` / `training_manual_chocolate_room.md` | How staff are told to run tours and the Chocolate Room. Complements incidents: rulebook vs after-action. |
-| `glass_elevator_maintenance_log.md` | Semi-structured log (asset, manufacturer, dates). Not prose policy — a different retrieval shape. |
-
-### Security and risk
-
-| Document | 
-|---|---|
-| `it_security_policy.md` | Vault, biometrics, classified recipes. Typical IT policy corpus. |
-| `security_report_slugworth_2019.md` | Named espionage incident around WX-77. Cross-links the gobstopper spec to a security file — **context recall** if you ask about Slugworth or the formula. |
-| `memo_golden_ticket_anniversary.md` | Internal comms / history. Lighter tone, still in-corpus. |
 
 About 29 objects in S3, all markdown, all fake, all in the shape of SharePoint-or-S3 company dump: **policies, minutes, specs, incidents, contracts, training**. That mix is the experiment. A managed Knowledge Base has to search across those types; Nova Lite has to answer only from what came back — including saying it does not know.
 
