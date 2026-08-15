@@ -3,11 +3,13 @@
 <p align="center">
   <img src="docs/willy-wonka-banter.png" alt="Wonka — synthetic founder, real RAG" width="280">
 </p>
-<p align="center"><em>The founder. Synthetic, like the rest of the corpus. The Knowledge Base still will not tell you his weight class.</em></p>
+<p align="center"><em>End to End RAG Project utilising Amazon Bedrock's managed Knowledge Base.</em></p>
 
-A small end-to-end RAG project that uses **Amazon Bedrock’s managed Knowledge Base** instead of a homemade chunker and vector database. The point is to show how a real company-shaped document store can sit in S3, get ingested once by AWS, and then be queried from a thin FastAPI app.
+A small end-to-end RAG project that uses **Amazon Bedrock’s managed Knowledge Base** instead of a homemade chunker and vector database. The goal was to show how in a production environment one could ingest from S3, chunked and vectorised by Knowledge base managed by AWS, and finally be queried from a thin FastAPI app.
 
-We did not build OpenSearch, FAISS, or a splitting pipeline in this repo. Bedrock Knowledge Base `A30YI231W3` already did chunking, embeddings, and hybrid search. This app only **retrieves** from that service and asks **Amazon Nova Lite** to write an answer the user can read.
+The advantage of using a managed Knowledge Base is that one can focus on the retrieval and generation of the answer, while the underlying infrastructure is managed by AWS with the added benefit of being able to scale the infrastructure as needed whilst maintaining security and compliance..
+
+I did not build OpenSearch, FAISS, or a splitting pipeline in for this repo. Bedrock Knowledge Base does the chunking, embeddings, and hybrid search. This app only **retrieves** from that service and asks **Amazon Nova Lite** to write an answer the user can read. Nova Lite was chosen as it is a cheap model that is great for prototype and development purposes.
 
 ```
 S3 bucket  wonka-industries-rag-data   (source of truth)
@@ -19,12 +21,11 @@ FastAPI  →  Nova Lite (amazon.nova-lite-v1:0)
 Browser UI at http://127.0.0.1:8000/
 ```
 
-The Pluralsight sandbox blocks Claude Opus for IAM user `cloud_user`, so generation uses **Amazon Nova Lite** (`amazon.nova-lite-v1:0`). That was also a cost choice: Nova Lite is cheaper than Opus (and other large chat models) for the “write the answer” step, while still being good enough to judge the system with **RAGAS** — faithfulness, answer relevance, context precision, and context recall. The Knowledge Base itself does not depend on which writer you pick; the expensive part of RAG here is retrieval quality, not a flagship LLM.
 
-## What we did
+## What was did
 
 1. **Put a company corpus in S3.** Bucket `wonka-industries-rag-data` in `us-east-1` holds 29 markdown files. They are **synthetic** (Wonka is fictional) but they are written like the mix a real firm would dump into a shared drive: policies, board packs, product specs, incident reports, contracts, training.
-2. **Let a managed service index them.** A Bedrock “quick start” Knowledge Base ingested that bucket. AWS owns chunking, embeddings, and retrieval. The IAM role `AmazonBedrockExecutionRoleForKnowledgeBase_q8u02` is the worker Bedrock uses; the ID the API needs is `A30YI231W3`.
+2. **Let a managed service index them.** A Bedrock “quick start” Knowledge Base ingested that bucket. AWS owns chunking, embeddings, and retrieval. 
 3. **Query that index from Python.** `scripts/s3_sync.py` can list or copy objects; `src/rag.py` calls `Retrieve` with `managedSearchConfiguration` (required for a managed KB), then `Converse` on Nova Lite.
 4. **Wrap it in FastAPI.** A local UI at `/` asks a question; `/ask` returns JSON. Same path as the CLI (`scripts/ask_kb.py`).
 
@@ -47,7 +48,7 @@ That overlap is deliberate. A managed RAG system should find the right *kind* of
 
 ### Board, numbers, and strategy
 
-| Document | Why it is in the bucket |
+| Document |
 |---|---|
 | `board_minutes_q3_2023.md` / `board_minutes_q4_2023.md` | Time-stamped decisions and the same 3,200 headcount. Minutes are messy and specific — the opposite of a polished handbook. |
 | `annual_report_summary_2023.md` | Revenue mix, geography, year-on-year employees (2,950 → 3,200). A second source for the same KPI. |
@@ -56,7 +57,7 @@ That overlap is deliberate. A managed RAG system should find the right *kind* of
 
 ### Product, R&D, and quality
 
-| Document | Why it is in the bucket |
+| Document |
 |---|---|
 | `product_spec_everlasting_gobstopper.md` | Flagship SKU, layers, Compound WX-77, who knows the formula. Dense technical spec — classic “search my product bible”. |
 | `product_spec_fizzy_lifting_drinks.md` / `product_spec_three_course_gum.md` | More SKUs so retrieval must pick the *right* product, not a generic sweets answer. |
@@ -66,7 +67,7 @@ That overlap is deliberate. A managed RAG system should find the right *kind* of
 
 ### Safety, incidents, and the factory floor
 
-| Document | Why it is in the bucket |
+| Document | 
 |---|---|
 | `health_and_safety_policy.md` / `emergency_evacuation_plan.md` | What *should* happen. Procedures vs the incident write-ups below. |
 | `incident_report_001_gloop.md` / `_002_beauregarde.md` / `_003_salt.md` | What *did* happen (factory-tour mishaps). Narrative, named people, dates. RAG should not confuse a 2005 incident with current policy. |
@@ -76,7 +77,7 @@ That overlap is deliberate. A managed RAG system should find the right *kind* of
 
 ### Security and risk
 
-| Document | Why it is in the bucket |
+| Document | 
 |---|---|
 | `it_security_policy.md` | Vault, biometrics, classified recipes. Typical IT policy corpus. |
 | `security_report_slugworth_2019.md` | Named espionage incident around WX-77. Cross-links the gobstopper spec to a security file — **context recall** if you ask about Slugworth or the formula. |
@@ -98,7 +99,7 @@ The header portrait is the same Wonka illustration as at the top of this README.
 
 ## Why Nova Lite (and RAGAS)
 
-The **question / answer** step uses Nova Lite on purpose. A bigger model (Opus, large Sonnet, and so on) costs more per token and, in this sandbox, Opus is blocked anyway. For a small managed-KB demo, a cheap writer is enough: RAGAS is scoring whether the answer **stuck to retrieved chunks**, **addressed the question**, and whether retrieval **picked the right documents** — not whether the prose sounds like a frontier model.
+The **question / answer** step uses Nova Lite on purpose.  For a small managed-KB demo, a cheap writer is enough: RAGAS is scoring whether the answer **stuck to retrieved chunks**, **addressed the question**, and whether retrieval **picked the right documents** — not whether the prose sounds like a frontier model.
 
 If Nova Lite stays faithful on in-corpus HR facts and refuses out-of-corpus nonsense, the pipeline is testable. Spending more on the writer would not fix a bad retrieve.
 
