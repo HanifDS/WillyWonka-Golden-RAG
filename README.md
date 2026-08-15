@@ -22,7 +22,7 @@ Browser UI at http://127.0.0.1:8000/
 ```
 
 
-## What was did
+## What was done
 
 1. **Put a company corpus in S3.** Bucket `wonka-industries-rag-data` in `us-east-1` holds 29 markdown files. They are **synthetic** (Wonka is fictional) but they are written like the mix a real firm would dump into a shared drive: policies, board packs, product specs, incident reports, contracts, training.
 2. **Let a managed service index them.** A Bedrock “quick start” Knowledge Base ingested that bucket. AWS owns chunking, embeddings, and retrieval. 
