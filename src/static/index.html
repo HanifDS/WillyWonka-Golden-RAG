@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wonka Knowledge Base</title>
+  <style>
+    :root {
+      --bg: #1c1008;
+      --panel: #2a1810;
+      --ink: #f6e8c9;
+      --muted: #c4a574;
+      --gold: #e2b84a;
+      --accent: #8b1e1e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Georgia, "Times New Roman", serif;
+      background: radial-gradient(circle at top, #3a2216, var(--bg));
+      color: var(--ink);
+    }
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 48px 20px 80px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 2rem;
+      color: var(--gold);
+    }
+    .hero {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+    .hero img {
+      width: 140px;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 3px solid var(--gold);
+      box-shadow: 0 0 24px rgba(226, 184, 74, 0.35);
+    }
+    .caption {
+      margin: 6px 0 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+    p.lede {
+      margin: 0;
+      color: var(--muted);
+    }
+    form { display: flex; gap: 8px; }
+    input[type="text"] {
+      flex: 1;
+      padding: 12px 14px;
+      border: 1px solid #5c3b22;
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--ink);
+      font-size: 1rem;
+    }
+    button {
+      padding: 12px 18px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--gold);
+      color: var(--bg);
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button:disabled { opacity: 0.6; cursor: wait; }
+    #status { min-height: 1.4em; margin: 12px 0; color: var(--muted); font-size: 0.95rem; }
+    #answer {
+      white-space: pre-wrap;
+      background: var(--panel);
+      border: 1px solid #5c3b22;
+      border-radius: 10px;
+      padding: 20px;
+      line-height: 1.5;
+    }
+    .meta { margin-top: 16px; font-size: 0.85rem; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="hero">
+      <img src="/static/willy-wonka-banter.png" alt="The founder, probably" />
+      <div>
+        <h1>Wonka Knowledge Base</h1>
+        <p class="lede">Ask a question. The API finds chunks in AWS, then Nova Lite writes the answer.</p>
+        <p class="caption">“A little nonsense now and then is relished by the wisest men.” — not in the Knowledge Base.</p>
+      </div>
+    </div>
+    <form id="ask-form">
+      <input id="q" type="text" name="q" placeholder="What is the everlasting gobstopper?" required />
+      <button type="submit">Ask</button>
+    </form>
+    <p id="status"></p>
+    <div id="answer">Type a question and press Ask.</div>
+    <p class="meta" id="meta"></p>
+  </main>
+  <script>
+    const form = document.getElementById("ask-form");
+    const input = document.getElementById("q");
+    const status = document.getElementById("status");
+    const answer = document.getElementById("answer");
+    const meta = document.getElementById("meta");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const question = input.value.trim();
+      if (!question) return;
+      status.textContent = "Searching the Knowledge Base…";
+      answer.textContent = "";
+      meta.textContent = "";
+      form.querySelector("button").disabled = true;
+      try {
+        const res = await fetch("/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "Request failed");
+        answer.textContent = data.answer;
+        meta.textContent = "Model: " + data.model + "  ·  KB: " + data.knowledge_base_id;
+        status.textContent = "";
+      } catch (err) {
+        status.textContent = "";
+        answer.textContent = "Error: " + err.message;
+      } finally {
+        form.querySelector("button").disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
