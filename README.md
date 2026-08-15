@@ -31,7 +31,7 @@ Browser UI at http://127.0.0.1:8000/
 
 ## The S3 corpus: synthetic, but company-shaped
 
-None of this is real data. Willy Wonka would I do apologise. It is a **made-up but realistic** intranet: named roles, document IDs, dates, “CONFIDENTIAL” markings, and facts that **repeat across files** (headcount 3,200, founded 1962) the way a real handbook, annual report, and board minutes would overlap.
+None of this is real data. Willy Wonka would not be happy at my liberties and I do apologise. It is a **made-up but realistic** intranet: named roles, document IDs, dates, “CONFIDENTIAL” markings, and facts that **repeat across files** (headcount 3,200, founded 1962) the way a real handbook, annual report, and board minutes would overlap.
 
 That overlap is deliberate. A managed RAG system should find the right *kind* of document (precision) and, when a number lives in more than one place, not miss the extras (recall). A single Wikipedia-style page would not test that.
 
