@@ -87,10 +87,6 @@ Together: Nova Lite is cheap enough to run these checks often, and still good en
 
 This project uses a conda env at `.venv` (not a `venv` activate script):
 
-```bash
-conda activate /Users/HanifDS/Documents/AIProjects/RAGProject/WillieWonka/.venv
-```
-
 From the project root you can also use:
 
 ```bash
